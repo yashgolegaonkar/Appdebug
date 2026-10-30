@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Toxy Audit Lite</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d2e;--panel2:#18263a;--line:#26374e;--text:#edf4ff;--muted:#9aacc3;--cyan:#54d6d0;--green:#63d69b;--amber:#ffca72;--red:#ff7f87}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% -10%,#1b3a4a 0,transparent 35%),var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:22px max(18px,calc((100% - 1050px)/2));border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-weight:800;letter-spacing:.4px;font-size:19px}.brand span{color:var(--cyan)}.tag{font-size:11px;color:var(--green);border:1px solid #2d765d;padding:5px 9px;border-radius:30px}
+main{max-width:1050px;margin:auto;padding:24px 18px 60px}.hero{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;margin-bottom:22px}
+h1{font-size:28px;margin:0 0 7px}.sub{color:var(--muted);max-width:620px;line-height:1.5}
+button,.btn{background:var(--cyan);color:#082026;border:0;padding:11px 15px;border-radius:11px;font-weight:750;cursor:pointer}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}button:disabled{opacity:.5;cursor:default}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.card{background:linear-gradient(145deg,var(--panel),#101a29);border:1px solid var(--line);border-radius:16px;padding:17px}
+.metric{font-size:27px;font-weight:800;margin:5px 0}.muted{color:var(--muted);font-size:13px}
+.layout{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.card h2{font-size:16px;margin:0 0 13px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}
+.row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);align-items:center}
+.pill{font-size:11px;padding:4px 8px;border-radius:30px;background:#20374a;color:var(--cyan)}
+.status{color:var(--green)}.notice{background:#28251b;border:1px solid #66532e;color:#f6d99f;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.5;margin:14px 0}
+input[type=text]{background:#0c1727;border:1px solid var(--line);border-radius:9px;padding:11px;color:var(--text);width:100%;margin:5px 0 9px}
+input[type=file]{width:100%;color:var(--muted);margin:10px 0}
+ul{padding-left:19px;color:var(--muted);line-height:1.7}.empty{color:var(--muted);padding:14px 0}
+footer{color:var(--muted);font-size:12px;text-align:center;margin-top:24px}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}h1{font-size:24px}}
+</style></head>
+<body>
+<header><div class="brand">TOXY <span>AUDIT</span> <small style="color:#9aacc3;font-weight:500">LITE</small></div><div class="tag">● LOCAL • NO ACCOUNT</div></header>
+<main>
+<section class="hero"><div><h1>System Audit Dashboard</h1><div class="sub">A lightweight, passkey-free audit workspace for keeping a personal record of installed apps, removed apps, and APK files you choose to inspect.</div></div><button id="scan">Run quick audit</button></section>
+<div class="notice"><b>Privacy & capability:</b> This browser-based version does not silently inspect your phone, monitor app activity, or detect uninstalls automatically. Android restricts that access. It only works with information and files you explicitly provide.</div>
+<section class="grid">
+<div class="card"><div class="muted">Audit status</div><div class="metric status" id="auditStatus">Ready</div><div class="muted" id="auditTime">No audit run yet</div></div>
+<div class="card"><div class="muted">App records</div><div class="metric" id="appCount">0</div><div class="muted">Manually recorded</div></div>
+<div class="card"><div class="muted">Removed apps</div><div class="metric" id="removedCount">0</div><div class="muted">Your own records</div></div>
+<div class="card"><div class="muted">APK files selected</div><div class="metric" id="apkCount">0</div><div class="muted">Local file list only</div></div>
+</section>
+<div class="layout">
+<section class="card"><h2>App inventory</h2>
+<label class="muted" for="appName">Add an app record</label><input id="appName" type="text" placeholder="App name (e.g. Notes)">
+<label class="muted" for="pkgName">Package name (optional)</label><input id="pkgName" type="text" placeholder="com.example.notes">
+<div class="actions"><button id="addApp">Add to inventory</button><button class="secondary" id="markRemoved">Mark latest as removed</button></div>
+<div id="apps"><div class="empty">No app records yet. Add entries to start your audit.</div></div>
+</section>
+<section class="card"><h2>APK file review</h2><div class="muted">Choose APK files from your device. This tool lists file names and sizes; it does not install or execute them or claim they are safe.</div>
+<input id="apkFiles" type="file" accept=".apk,application/vnd.android.package-archive" multiple>
+<div id="apks"><div class="empty">No APK files selected.</div></div>
+<div class="notice">A file's name and size cannot establish whether an APK is malicious. Only install apps from trusted sources and review Android's security warnings.</div>
+</section>
+</div>
+<section class="card" style="margin-top:14px"><h2>Audit report</h2><div class="muted">Export your current local records as a plain-text report.</div><div class="actions"><button id="export">Export report</button><button class="secondary" id="clear">Clear local session</button></div><div class="muted" id="reportMsg">Nothing exported yet.</div></section>
+<footer>TOXY AUDIT LITE • Independent demo • No passkey • No background monitoring</footer>
+</main>
+<script>
+const apps=[];let apks=[];
+const $=id=>document.getElementById(id);
+function renderApps(){ $('appCount').textContent=apps.length;$('removedCount').textContent=apps.filter(a=>a.removed).length;
+$('apps').innerHTML=apps.length?apps.map((a,i)=>`<div class="row"><div><b>${esc(a.name)}</b><div class="muted">${esc(a.pkg||'Package not provided')}</div></div><span class="pill">${a.removed?'REMOVED':'RECORDED'}</span></div>`).join(''):'<div class="empty">No app records yet.</div>';}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+$('addApp').onclick=()=>{let n=$('appName').value.trim();if(!n){$('appName').focus();return;}apps.push({name:n,pkg:$('pkgName').value.trim(),removed:false});$('appName').value='';$('pkgName').value='';renderApps();};
+$('markRemoved').onclick=()=>{let a=[...apps].reverse().find(x=>!x.removed);if(a){a.removed=true;renderApps();}};
+$('apkFiles').onchange=e=>{apks=Array.from(e.target.files||[]).map(f=>({name:f.name,size:f.size}));$('apkCount').textContent=apks.length;$('apks').innerHTML=apks.length?apks.map(f=>`<div class="row"><div><b>${esc(f.name)}</b><div class="muted">${(f.size/1024/1024).toFixed(2)} MB</div></div><span class="pill">SELECTED</span></div>`).join(''):'<div class="empty">No APK files selected.</div>';};
+$('scan').onclick=()=>{$('auditStatus').textContent='Complete';$('auditTime').textContent=new Date().toLocaleString();};
+$('export').onclick=()=>{let report=['TOXY AUDIT LITE REPORT','Generated: '+new Date().toLocaleString(),'','APP INVENTORY',...(apps.length?apps.map(a=>`${a.removed?'REMOVED':'RECORDED'} | ${a.name} | ${a.pkg}`):['No app records']),'','APK FILES SELECTED',...(apks.length?apks.map(f=>`${f.name} | ${(f.size/1024/1024).toFixed(2)} MB`):['No APK files selected']),'','Note: This report contains user-entered records and selected file metadata only. It is not a malware verdict or a complete Android system scan.'].join('\n');let blob=new Blob([report],{type:'text/plain'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='toxy-audit-report.txt';a.click();URL.revokeObjectURL(url);$('reportMsg').textContent='Report exported.';};
+$('clear').onclick=()=>{apps.splice(0);apks=[];$('apkFiles').value='';$('apkCount').textContent='0';$('auditStatus').textContent='Ready';$('auditTime').textContent='No audit run yet';$('apks').innerHTML='<div class="empty">No APK files selected.</div>';$('reportMsg').textContent='Local session cleared.';renderApps();};
+</script></body></html>
